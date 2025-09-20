@@ -25,52 +25,64 @@ const RouteSelector = () => {
 
   const routes: Route[] = [
     {
-      id: "1A",
-      name: "Central - University Express",
-      from: "Central Station",
-      to: "University Campus",
-      distance: "12.5 km",
-      duration: "35 min",
+      id: "KKD-RJY-01",
+      name: "Kakinada - Rajahmundry Express",
+      from: "Kakinada Bus Station",
+      to: "Rajahmundry Bus Station",
+      distance: "61 km",
+      duration: "1h 45min",
+      stops: 12,
+      fare: 65,
+      frequency: "Every 30 min",
+      nextBus: "8 min"
+    },
+    {
+      id: "KKD-RJY-02",
+      name: "Kakinada - Rajahmundry Local",
+      from: "Kakinada Port",
+      to: "Rajahmundry Railway Station",
+      distance: "63 km",
+      duration: "2h 15min",
+      stops: 18,
+      fare: 45,
+      frequency: "Every 45 min",
+      nextBus: "22 min"
+    },
+    {
+      id: "KKD-AMP-01",
+      name: "Kakinada - Amalapuram",
+      from: "Kakinada Bus Station",
+      to: "Amalapuram Bus Stand",
+      distance: "28 km",
+      duration: "50 min",
       stops: 8,
-      fare: 25,
-      frequency: "Every 15 min",
+      fare: 35,
+      frequency: "Every 20 min",
       nextBus: "5 min"
     },
     {
-      id: "2B",
-      name: "Mall - Airport Connect",
-      from: "City Mall",
-      to: "International Airport",
-      distance: "18.2 km",
-      duration: "45 min",
-      stops: 12,
+      id: "AMP-RJY-01",
+      name: "Amalapuram - Rajahmundry",
+      from: "Amalapuram Bus Stand",
+      to: "Rajahmundry Bus Station",
+      distance: "33 km",
+      duration: "55 min",
+      stops: 7,
       fare: 40,
-      frequency: "Every 20 min",
+      frequency: "Every 25 min",
       nextBus: "12 min"
     },
     {
-      id: "3C",
-      name: "University - Railway Circle",
-      from: "University Gate",
-      to: "Railway Station",
-      distance: "8.7 km",
+      id: "KKD-RZL-01",
+      name: "Kakinada - Razole Shuttle",
+      from: "Kakinada Port",
+      to: "Razole Market",
+      distance: "15 km",
       duration: "25 min",
-      stops: 6,
-      fare: 20,
-      frequency: "Every 10 min",
-      nextBus: "3 min"
-    },
-    {
-      id: "4D",
-      name: "Tech Park Shuttle",
-      from: "Metro Station",
-      to: "IT Tech Park",
-      distance: "6.3 km",
-      duration: "20 min",
       stops: 4,
-      fare: 15,
-      frequency: "Every 12 min",
-      nextBus: "8 min"
+      fare: 20,
+      frequency: "Every 15 min",
+      nextBus: "3 min"
     }
   ];
 
@@ -80,8 +92,8 @@ const RouteSelector = () => {
   );
 
   const quickLocations = [
-    "Central Station", "University Campus", "City Mall", "International Airport",
-    "Railway Station", "Tech Park", "Medical College", "Sports Complex"
+    "Kakinada Bus Station", "Rajahmundry Bus Station", "Amalapuram Bus Stand", "Kakinada Port",
+    "Rajahmundry Railway Station", "Razole Market", "Peddapuram", "Samalkot Junction"
   ];
 
   return (

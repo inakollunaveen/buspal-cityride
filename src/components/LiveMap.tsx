@@ -15,9 +15,9 @@ interface BusLocation {
 
 const LiveMap = () => {
   const [buses, setBuses] = useState<BusLocation[]>([
-    { id: "BUS001", route: "Route 1A", lat: 28.6139, lng: 77.2090, status: "on-time", nextStop: "Central Station", eta: "3 min" },
-    { id: "BUS002", route: "Route 2B", lat: 28.6129, lng: 77.2295, status: "delayed", nextStop: "City Mall", eta: "7 min" },
-    { id: "BUS003", route: "Route 3C", lat: 28.6219, lng: 77.2085, status: "ahead", nextStop: "University", eta: "2 min" },
+    { id: "AP39Z1234", route: "KKD-RJY-01", lat: 16.8500, lng: 82.1200, status: "on-time", nextStop: "Samalkot Junction", eta: "12 min" },
+    { id: "AP39Z5678", route: "KKD-RJY-02", lat: 16.7800, lng: 81.9500, status: "delayed", nextStop: "Amalapuram", eta: "18 min" },
+    { id: "AP39Z9012", route: "KKD-AMP-01", lat: 16.7500, lng: 82.1800, status: "ahead", nextStop: "Razole Market", eta: "8 min" },
   ]);
 
   // Simulate real-time updates
@@ -70,7 +70,7 @@ const LiveMap = () => {
         <div className="absolute bottom-4 right-4 flex gap-2">
           <Badge variant="outline" className="bg-card/80">
             <MapPin className="w-3 h-3 mr-1" />
-            Delhi NCR
+            East Godavari District
           </Badge>
         </div>
       </div>

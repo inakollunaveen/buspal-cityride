@@ -23,37 +23,48 @@ const BusTracker = () => {
 
   const buses: BusInfo[] = [
     {
-      id: "BUS001",
-      route: "Route 1A - Central to University",
-      currentStop: "Central Station",
-      nextStop: "Medical College",
+      id: "AP39Z1234",
+      route: "KKD-RJY-01 - Kakinada to Rajahmundry Express",
+      currentStop: "Peddapuram",
+      nextStop: "Samalkot Junction",
       capacity: 40,
-      occupancy: 32,
+      occupancy: 26,
       delay: 0,
-      driver: "Rajesh Kumar",
+      driver: "Ravi Kumar",
       lastUpdate: "2 min ago"
     },
     {
-      id: "BUS002",
-      route: "Route 2B - Mall to Airport",
-      currentStop: "City Mall",
-      nextStop: "Tech Park",
+      id: "AP39Z5678",
+      route: "KKD-RJY-02 - Kakinada to Rajahmundry Local",
+      currentStop: "Amalapuram Bus Stand",
+      nextStop: "Sakhinetipalli",
       capacity: 45,
-      occupancy: 28,
-      delay: 5,
-      driver: "Amit Singh",
+      occupancy: 36,
+      delay: 8,
+      driver: "Suresh Babu",
       lastUpdate: "1 min ago"
     },
     {
-      id: "BUS003",
-      route: "Route 3C - University to Railway",
-      currentStop: "University Gate",
-      nextStop: "Sports Complex",
+      id: "AP39Z9012",
+      route: "KKD-AMP-01 - Kakinada to Amalapuram",
+      currentStop: "Razole Market",
+      nextStop: "Amalapuram Bus Stand",
       capacity: 35,
-      occupancy: 20,
-      delay: -2,
-      driver: "Priya Sharma",
+      occupancy: 16,
+      delay: -3,
+      driver: "Venkat Rao",
       lastUpdate: "30 sec ago"
+    },
+    {
+      id: "AP39Z3456",
+      route: "AMP-RJY-01 - Amalapuram to Rajahmundry",
+      currentStop: "Near Tanuku",
+      nextStop: "Rajahmundry Railway Station",
+      capacity: 38,
+      occupancy: 21,
+      delay: 5,
+      driver: "Krishna Murthy",
+      lastUpdate: "1 min ago"
     }
   ];
 

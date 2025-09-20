@@ -22,8 +22,8 @@ const Index = () => {
             <div className="flex items-center space-x-3">
               <Bus className="h-8 w-8 text-primary-foreground" />
               <div>
-                <h1 className="text-2xl font-bold text-primary-foreground">CityTracker</h1>
-                <p className="text-primary-foreground/80 text-sm">Smart Transportation System</p>
+                <h1 className="text-2xl font-bold text-primary-foreground">East Godavari Transit</h1>
+                <p className="text-primary-foreground/80 text-sm">Kakinada - Rajahmundry Transportation</p>
               </div>
             </div>
             <div className="flex items-center space-x-2">
