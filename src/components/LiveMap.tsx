@@ -22,6 +22,8 @@ interface RoutePoint {
 }
 
 const LiveMap = () => {
+  const [selectedBus, setSelectedBus] = useState<string | null>(null);
+
   // Route points for Kakinada to Rajahmundry
   const routePoints: RoutePoint[] = [
     { name: "Kakinada", lat: 16.9891, lng: 82.2475 },
@@ -194,19 +196,25 @@ const LiveMap = () => {
           const routeProgress = (index + 1) / buses.length;
           const xPos = 15 + routeProgress * 75;
           const yPos = 80 - routeProgress * 70;
+          const isSelected = selectedBus === bus.id;
           
           return (
             <div
               key={bus.id}
-              className="absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-1000"
+              className={`absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-1000 ${
+                isSelected ? 'scale-150 z-20' : 'hover:scale-110'
+              }`}
               style={{
                 left: `${xPos}%`,
                 top: `${yPos}%`,
               }}
+              onClick={() => setSelectedBus(isSelected ? null : bus.id)}
             >
               <div className="relative group cursor-pointer">
                 {/* Bus Icon */}
                 <div className={`w-5 h-5 rounded-full flex items-center justify-center shadow-lg ${
+                  isSelected ? 'ring-4 ring-yellow-400 ring-opacity-50' : ''
+                } ${
                   bus.status === 'on-time' ? 'bg-green-500' : 
                   bus.status === 'delayed' ? 'bg-red-500' : 'bg-blue-500'
                 } animate-pulse`}>
@@ -214,16 +222,24 @@ const LiveMap = () => {
                 </div>
                 
                 {/* Bus Info Tooltip */}
-                <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-white dark:bg-slate-800 border rounded-lg px-3 py-2 text-xs whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                <div className={`absolute -top-20 left-1/2 transform -translate-x-1/2 bg-white dark:bg-slate-800 border rounded-lg px-3 py-2 text-xs whitespace-nowrap shadow-lg transition-opacity pointer-events-none z-10 ${
+                  isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                }`}>
                   <div className="font-medium">{bus.id}</div>
                   <div className="text-muted-foreground">{bus.route}</div>
                   <div className="text-green-600">{bus.speed}</div>
+                  <div className="text-xs text-muted-foreground">Click to track</div>
                 </div>
                 
                 {/* Direction Arrow */}
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full flex items-center justify-center">
                   <Navigation className="w-2 h-2 text-white" style={{ transform: 'rotate(45deg)' }} />
                 </div>
+
+                {/* Selection Pulse Effect */}
+                {isSelected && (
+                  <div className="absolute inset-0 rounded-full bg-yellow-400 opacity-30 animate-ping"></div>
+                )}
               </div>
             </div>
           );
@@ -254,48 +270,66 @@ const LiveMap = () => {
 
       {/* Enhanced Bus Status Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {buses.map((bus) => (
-          <Card key={bus.id} className="p-4 hover:shadow-lg transition-shadow">
-            <div className="flex items-center justify-between mb-3">
-              <Badge variant="outline" className="text-xs font-mono">{bus.id}</Badge>
-              <Badge 
-                className={
-                  bus.status === 'on-time' ? 'bg-green-500 text-white' :
-                  bus.status === 'delayed' ? 'bg-red-500 text-white' :
-                  'bg-blue-500 text-white'
-                }
-              >
-                {bus.status.toUpperCase()}
-              </Badge>
-            </div>
-            
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center gap-2">
-                <Navigation className="w-4 h-4 text-primary" />
-                <div>
-                  <div className="font-medium">{bus.route}</div>
-                  <div className="text-muted-foreground text-xs">{bus.direction}</div>
-                </div>
+        {buses.map((bus) => {
+          const isSelected = selectedBus === bus.id;
+          
+          return (
+            <Card 
+              key={bus.id} 
+              className={`p-4 cursor-pointer transition-all duration-300 ${
+                isSelected 
+                  ? 'ring-2 ring-primary shadow-lg scale-105 bg-primary/5' 
+                  : 'hover:shadow-lg hover:scale-102'
+              }`}
+              onClick={() => setSelectedBus(isSelected ? null : bus.id)}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <Badge variant="outline" className="text-xs font-mono">{bus.id}</Badge>
+                <Badge 
+                  className={
+                    bus.status === 'on-time' ? 'bg-green-500 text-white' :
+                    bus.status === 'delayed' ? 'bg-red-500 text-white' :
+                    'bg-blue-500 text-white'
+                  }
+                >
+                  {bus.status.toUpperCase()}
+                </Badge>
               </div>
               
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-muted-foreground" />
-                <div>
-                  <div className="font-medium">Next: {bus.nextStop}</div>
-                  <div className="text-muted-foreground text-xs">GPS: {bus.lat.toFixed(4)}, {bus.lng.toFixed(4)}</div>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <Navigation className="w-4 h-4 text-primary" />
+                  <div>
+                    <div className="font-medium">{bus.route}</div>
+                    <div className="text-muted-foreground text-xs">{bus.direction}</div>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex items-center justify-between pt-2 border-t">
-                <div className="flex items-center gap-1">
-                  <Clock className="w-3 h-3 text-muted-foreground" />
-                  <span className="text-muted-foreground">{bus.eta}</span>
+                
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-muted-foreground" />
+                  <div>
+                    <div className="font-medium">Next: {bus.nextStop}</div>
+                    <div className="text-muted-foreground text-xs">GPS: {bus.lat.toFixed(4)}, {bus.lng.toFixed(4)}</div>
+                  </div>
                 </div>
-                <div className="font-medium text-primary">{bus.speed}</div>
+                
+                <div className="flex items-center justify-between pt-2 border-t">
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-3 h-3 text-muted-foreground" />
+                    <span className="text-muted-foreground">{bus.eta}</span>
+                  </div>
+                  <div className="font-medium text-primary">{bus.speed}</div>
+                </div>
+
+                {isSelected && (
+                  <div className="mt-2 p-2 bg-primary/10 rounded text-xs text-center text-primary font-medium">
+                    📍 Bus location highlighted on map
+                  </div>
+                )}
               </div>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
