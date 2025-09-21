@@ -11,17 +11,105 @@ interface BusLocation {
   status: "on-time" | "delayed" | "ahead";
   nextStop: string;
   eta: string;
+  speed: string;
+  direction: string;
+}
+
+interface RoutePoint {
+  name: string;
+  lat: number;
+  lng: number;
 }
 
 const LiveMap = () => {
+  // Route points for Kakinada to Rajahmundry
+  const routePoints: RoutePoint[] = [
+    { name: "Kakinada", lat: 16.9891, lng: 82.2475 },
+    { name: "Samalkot", lat: 16.8833, lng: 82.1667 },
+    { name: "Amalapuram", lat: 16.5833, lng: 82.0167 },
+    { name: "Razole", lat: 16.4833, lng: 81.8333 },
+    { name: "Peddapuram", lat: 17.0833, lng: 82.1333 },
+    { name: "Rajahmundry", lat: 17.0005, lng: 81.7880 },
+  ];
+
   const [buses, setBuses] = useState<BusLocation[]>([
-    { id: "AP39Z1234", route: "KKD-RJY-01", lat: 16.8500, lng: 82.1200, status: "on-time", nextStop: "Samalkot Junction", eta: "12 min" },
-    { id: "AP39Z5678", route: "KKD-RJY-02", lat: 16.7800, lng: 81.9500, status: "delayed", nextStop: "Amalapuram", eta: "18 min" },
-    { id: "AP39Z9012", route: "KKD-AMP-01", lat: 16.7500, lng: 82.1800, status: "ahead", nextStop: "Razole Market", eta: "8 min" },
-    { id: "AP39Z8901", route: "KKD-RJY-EXPRESS", lat: 16.9200, lng: 82.2800, status: "on-time", nextStop: "Peddapuram", eta: "5 min" },
-    { id: "AP39Z7701", route: "KKD-AMP-02", lat: 16.6800, lng: 82.0500, status: "ahead", nextStop: "Razole", eta: "10 min" },
-    { id: "AP39Z9301", route: "KKD-MND-01", lat: 16.8800, lng: 82.1500, status: "delayed", nextStop: "Kotipalli", eta: "15 min" },
-    { id: "AP39Z4401", route: "KKD-VZM-01", lat: 16.8200, lng: 82.1000, status: "on-time", nextStop: "Ramachandrapuram", eta: "8 min" },
+    { 
+      id: "AP39Z1234", 
+      route: "KKD-RJY-01", 
+      lat: 16.8833, 
+      lng: 82.1667, 
+      status: "on-time", 
+      nextStop: "Samalkot Junction", 
+      eta: "12 min",
+      speed: "45 km/h",
+      direction: "towards Rajahmundry"
+    },
+    { 
+      id: "AP39Z5678", 
+      route: "KKD-RJY-02", 
+      lat: 16.5833, 
+      lng: 82.0167, 
+      status: "delayed", 
+      nextStop: "Amalapuram", 
+      eta: "18 min",
+      speed: "38 km/h",
+      direction: "towards Rajahmundry"
+    },
+    { 
+      id: "AP39Z9012", 
+      route: "KKD-AMP-01", 
+      lat: 16.4833, 
+      lng: 81.8333, 
+      status: "ahead", 
+      nextStop: "Razole Market", 
+      eta: "8 min",
+      speed: "52 km/h",
+      direction: "towards Amalapuram"
+    },
+    { 
+      id: "AP39Z8901", 
+      route: "KKD-RJY-EXPRESS", 
+      lat: 17.0833, 
+      lng: 82.1333, 
+      status: "on-time", 
+      nextStop: "Peddapuram", 
+      eta: "5 min",
+      speed: "55 km/h",
+      direction: "towards Rajahmundry"
+    },
+    { 
+      id: "AP39Z7701", 
+      route: "KKD-AMP-02", 
+      lat: 16.6833, 
+      lng: 82.0500, 
+      status: "ahead", 
+      nextStop: "Razole", 
+      eta: "10 min",
+      speed: "48 km/h",
+      direction: "towards Amalapuram"
+    },
+    { 
+      id: "AP39Z9301", 
+      route: "KKD-MND-01", 
+      lat: 16.9000, 
+      lng: 82.1500, 
+      status: "delayed", 
+      nextStop: "Kotipalli", 
+      eta: "15 min",
+      speed: "35 km/h",
+      direction: "towards Mandapeta"
+    },
+    { 
+      id: "AP39Z4401", 
+      route: "KKD-VZM-01", 
+      lat: 16.8200, 
+      lng: 82.1000, 
+      status: "on-time", 
+      nextStop: "Ramachandrapuram", 
+      eta: "8 min",
+      speed: "42 km/h",
+      direction: "towards Vizianagaram"
+    },
   ]);
 
   // Simulate real-time updates
@@ -39,74 +127,171 @@ const LiveMap = () => {
 
   return (
     <div className="space-y-4">
-      {/* Map Placeholder - In real implementation, this would be an actual map */}
-      <div className="h-80 bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg relative overflow-hidden border">
-        <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
-        <div className="absolute top-4 left-4">
-          <Badge variant="secondary" className="bg-live text-live-foreground">
-            <div className="w-2 h-2 bg-live-foreground rounded-full mr-2 animate-pulse"></div>
-            Live Tracking Active
-          </Badge>
+      {/* Enhanced Map with Route Visualization */}
+      <div className="h-96 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 rounded-lg relative overflow-hidden border border-slate-300 dark:border-slate-700">
+        {/* Map Grid Pattern */}
+        <div className="absolute inset-0 opacity-20">
+          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="1"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+          </svg>
         </div>
-        
-        {/* Simulated bus markers */}
-        {buses.map((bus, index) => (
+
+        {/* Route Line */}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none">
+          <path
+            d="M 15% 80% Q 30% 60% 45% 40% Q 60% 30% 75% 20% Q 85% 15% 90% 10%"
+            stroke="hsl(var(--primary))"
+            strokeWidth="3"
+            fill="none"
+            strokeDasharray="5,5"
+            className="animate-pulse"
+          />
+        </svg>
+
+        {/* Route Stops */}
+        {routePoints.map((point, index) => (
           <div
-            key={bus.id}
-            className="absolute transform -translate-x-1/2 -translate-y-1/2 animate-pulse"
+            key={point.name}
+            className="absolute transform -translate-x-1/2 -translate-y-1/2"
             style={{
-              left: `${30 + index * 25}%`,
-              top: `${40 + index * 15}%`,
+              left: `${15 + index * 15}%`,
+              top: `${80 - index * 12}%`,
             }}
           >
-            <div className="relative">
-              <div className={`w-4 h-4 rounded-full ${
-                bus.status === 'on-time' ? 'bg-live' : 
-                bus.status === 'delayed' ? 'bg-warning' : 'bg-accent'
-              } shadow-lg`}></div>
-              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-card border rounded px-2 py-1 text-xs whitespace-nowrap">
-                {bus.route}
+            <div className="flex flex-col items-center">
+              <div className="w-3 h-3 bg-primary border-2 border-white rounded-full shadow-lg"></div>
+              <div className="mt-1 bg-white dark:bg-slate-800 border rounded px-2 py-1 text-xs font-medium shadow-sm">
+                {point.name}
               </div>
             </div>
           </div>
         ))}
 
-        <div className="absolute bottom-4 right-4 flex gap-2">
-          <Badge variant="outline" className="bg-card/80">
-            <MapPin className="w-3 h-3 mr-1" />
-            East Godavari District
+        {/* Live Status Badge */}
+        <div className="absolute top-4 left-4">
+          <Badge variant="secondary" className="bg-primary text-primary-foreground">
+            <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+            Live GPS Tracking
           </Badge>
+        </div>
+
+        {/* Coordinate Display */}
+        <div className="absolute top-4 right-4">
+          <Badge variant="outline" className="bg-white/90 dark:bg-slate-800/90">
+            <MapPin className="w-3 h-3 mr-1" />
+            16.9891°N, 82.2475°E
+          </Badge>
+        </div>
+        
+        {/* Moving Bus Markers */}
+        {buses.map((bus, index) => {
+          // Calculate position based on route progress
+          const routeProgress = (index + 1) / buses.length;
+          const xPos = 15 + routeProgress * 75;
+          const yPos = 80 - routeProgress * 70;
+          
+          return (
+            <div
+              key={bus.id}
+              className="absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-1000"
+              style={{
+                left: `${xPos}%`,
+                top: `${yPos}%`,
+              }}
+            >
+              <div className="relative group cursor-pointer">
+                {/* Bus Icon */}
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center shadow-lg ${
+                  bus.status === 'on-time' ? 'bg-green-500' : 
+                  bus.status === 'delayed' ? 'bg-red-500' : 'bg-blue-500'
+                } animate-pulse`}>
+                  <div className="w-2 h-2 bg-white rounded-sm"></div>
+                </div>
+                
+                {/* Bus Info Tooltip */}
+                <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-white dark:bg-slate-800 border rounded-lg px-3 py-2 text-xs whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                  <div className="font-medium">{bus.id}</div>
+                  <div className="text-muted-foreground">{bus.route}</div>
+                  <div className="text-green-600">{bus.speed}</div>
+                </div>
+                
+                {/* Direction Arrow */}
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full flex items-center justify-center">
+                  <Navigation className="w-2 h-2 text-white" style={{ transform: 'rotate(45deg)' }} />
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
+        {/* Map Legend */}
+        <div className="absolute bottom-4 left-4 bg-white/90 dark:bg-slate-800/90 rounded-lg p-3 text-xs">
+          <div className="font-medium mb-2">Legend</div>
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            <span>On Time</span>
+          </div>
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+            <span>Delayed</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+            <span>Ahead</span>
+          </div>
+        </div>
+
+        {/* Scale Indicator */}
+        <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-slate-800/90 rounded px-2 py-1 text-xs">
+          Scale: 1:50,000
         </div>
       </div>
 
-      {/* Bus Status Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+      {/* Enhanced Bus Status Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {buses.map((bus) => (
-          <Card key={bus.id} className="p-3">
-            <div className="flex items-center justify-between mb-2">
-              <Badge variant="outline" className="text-xs">{bus.id}</Badge>
+          <Card key={bus.id} className="p-4 hover:shadow-lg transition-shadow">
+            <div className="flex items-center justify-between mb-3">
+              <Badge variant="outline" className="text-xs font-mono">{bus.id}</Badge>
               <Badge 
                 className={
-                  bus.status === 'on-time' ? 'bg-live text-live-foreground' :
-                  bus.status === 'delayed' ? 'bg-warning text-warning-foreground' :
-                  'bg-accent text-accent-foreground'
+                  bus.status === 'on-time' ? 'bg-green-500 text-white' :
+                  bus.status === 'delayed' ? 'bg-red-500 text-white' :
+                  'bg-blue-500 text-white'
                 }
               >
-                {bus.status}
+                {bus.status.toUpperCase()}
               </Badge>
             </div>
-            <div className="space-y-1 text-sm">
-              <div className="flex items-center gap-1">
-                <Navigation className="w-3 h-3 text-muted-foreground" />
-                <span className="font-medium">{bus.route}</span>
+            
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center gap-2">
+                <Navigation className="w-4 h-4 text-primary" />
+                <div>
+                  <div className="font-medium">{bus.route}</div>
+                  <div className="text-muted-foreground text-xs">{bus.direction}</div>
+                </div>
               </div>
-              <div className="flex items-center gap-1">
-                <MapPin className="w-3 h-3 text-muted-foreground" />
-                <span className="text-muted-foreground">{bus.nextStop}</span>
+              
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-muted-foreground" />
+                <div>
+                  <div className="font-medium">Next: {bus.nextStop}</div>
+                  <div className="text-muted-foreground text-xs">GPS: {bus.lat.toFixed(4)}, {bus.lng.toFixed(4)}</div>
+                </div>
               </div>
-              <div className="flex items-center gap-1">
-                <Clock className="w-3 h-3 text-muted-foreground" />
-                <span className="text-muted-foreground">{bus.eta}</span>
+              
+              <div className="flex items-center justify-between pt-2 border-t">
+                <div className="flex items-center gap-1">
+                  <Clock className="w-3 h-3 text-muted-foreground" />
+                  <span className="text-muted-foreground">{bus.eta}</span>
+                </div>
+                <div className="font-medium text-primary">{bus.speed}</div>
               </div>
             </div>
           </Card>
