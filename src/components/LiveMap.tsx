@@ -18,6 +18,10 @@ const LiveMap = () => {
     { id: "AP39Z1234", route: "KKD-RJY-01", lat: 16.8500, lng: 82.1200, status: "on-time", nextStop: "Samalkot Junction", eta: "12 min" },
     { id: "AP39Z5678", route: "KKD-RJY-02", lat: 16.7800, lng: 81.9500, status: "delayed", nextStop: "Amalapuram", eta: "18 min" },
     { id: "AP39Z9012", route: "KKD-AMP-01", lat: 16.7500, lng: 82.1800, status: "ahead", nextStop: "Razole Market", eta: "8 min" },
+    { id: "AP39Z8901", route: "KKD-RJY-EXPRESS", lat: 16.9200, lng: 82.2800, status: "on-time", nextStop: "Peddapuram", eta: "5 min" },
+    { id: "AP39Z7701", route: "KKD-AMP-02", lat: 16.6800, lng: 82.0500, status: "ahead", nextStop: "Razole", eta: "10 min" },
+    { id: "AP39Z9301", route: "KKD-MND-01", lat: 16.8800, lng: 82.1500, status: "delayed", nextStop: "Kotipalli", eta: "15 min" },
+    { id: "AP39Z4401", route: "KKD-VZM-01", lat: 16.8200, lng: 82.1000, status: "on-time", nextStop: "Ramachandrapuram", eta: "8 min" },
   ]);
 
   // Simulate real-time updates

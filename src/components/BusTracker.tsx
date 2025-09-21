@@ -13,7 +13,6 @@ interface BusInfo {
   capacity: number;
   occupancy: number;
   delay: number;
-  driver: string;
   lastUpdate: string;
 }
 
@@ -30,7 +29,6 @@ const BusTracker = () => {
       capacity: 40,
       occupancy: 26,
       delay: 0,
-      driver: "Ravi Kumar",
       lastUpdate: "2 min ago"
     },
     {
@@ -41,7 +39,6 @@ const BusTracker = () => {
       capacity: 45,
       occupancy: 36,
       delay: 8,
-      driver: "Suresh Babu",
       lastUpdate: "1 min ago"
     },
     {
@@ -52,7 +49,6 @@ const BusTracker = () => {
       capacity: 35,
       occupancy: 16,
       delay: -3,
-      driver: "Venkat Rao",
       lastUpdate: "30 sec ago"
     },
     {
@@ -63,7 +59,6 @@ const BusTracker = () => {
       capacity: 38,
       occupancy: 21,
       delay: 5,
-      driver: "Krishna Murthy",
       lastUpdate: "1 min ago"
     }
   ];
@@ -171,11 +166,7 @@ const BusTracker = () => {
                   </div>
 
                   {selectedBus === bus.id && (
-                    <div className="mt-4 pt-4 border-t grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-sm font-medium mb-1">Driver</p>
-                        <p className="text-sm text-muted-foreground">{bus.driver}</p>
-                      </div>
+                    <div className="mt-4 pt-4 border-t">
                       <div>
                         <p className="text-sm font-medium mb-1">Last Update</p>
                         <div className="flex items-center gap-1">

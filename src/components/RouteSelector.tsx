@@ -16,6 +16,7 @@ interface Route {
   fare: number;
   frequency: string;
   nextBus: string;
+  buses: { id: string; currentStop: string; eta: string; status: string; }[];
 }
 
 const RouteSelector = () => {
@@ -34,7 +35,11 @@ const RouteSelector = () => {
       stops: 12,
       fare: 65,
       frequency: "Every 30 min",
-      nextBus: "8 min"
+      nextBus: "8 min",
+      buses: [
+        { id: "AP39Z1234", currentStop: "Peddapuram", eta: "12 min", status: "on-time" },
+        { id: "AP39Z1235", currentStop: "Samalkot Junction", eta: "25 min", status: "delayed" }
+      ]
     },
     {
       id: "KKD-RJY-02",
@@ -46,7 +51,11 @@ const RouteSelector = () => {
       stops: 18,
       fare: 45,
       frequency: "Every 45 min",
-      nextBus: "22 min"
+      nextBus: "22 min",
+      buses: [
+        { id: "AP39Z5678", currentStop: "Amalapuram", eta: "18 min", status: "delayed" },
+        { id: "AP39Z5679", currentStop: "Sakhinetipalli", eta: "35 min", status: "on-time" }
+      ]
     },
     {
       id: "KKD-AMP-01",
@@ -58,7 +67,11 @@ const RouteSelector = () => {
       stops: 8,
       fare: 35,
       frequency: "Every 20 min",
-      nextBus: "5 min"
+      nextBus: "5 min",
+      buses: [
+        { id: "AP39Z9012", currentStop: "Razole Market", eta: "8 min", status: "ahead" },
+        { id: "AP39Z9013", currentStop: "Amalapuram Bus Stand", eta: "22 min", status: "on-time" }
+      ]
     },
     {
       id: "AMP-RJY-01",
@@ -70,7 +83,11 @@ const RouteSelector = () => {
       stops: 7,
       fare: 40,
       frequency: "Every 25 min",
-      nextBus: "12 min"
+      nextBus: "12 min",
+      buses: [
+        { id: "AP39Z3456", currentStop: "Near Tanuku", eta: "15 min", status: "delayed" },
+        { id: "AP39Z3457", currentStop: "Rajahmundry Railway Station", eta: "28 min", status: "on-time" }
+      ]
     },
     {
       id: "KKD-RZL-01",
@@ -82,7 +99,11 @@ const RouteSelector = () => {
       stops: 4,
       fare: 20,
       frequency: "Every 15 min",
-      nextBus: "3 min"
+      nextBus: "3 min",
+      buses: [
+        { id: "AP39Z7801", currentStop: "Kakinada Port", eta: "3 min", status: "on-time" },
+        { id: "AP39Z7802", currentStop: "Razole Market", eta: "18 min", status: "ahead" }
+      ]
     }
   ];
 
@@ -225,7 +246,32 @@ const RouteSelector = () => {
               </div>
 
               {selectedRoute === route.id && (
-                <div className="mt-4 pt-4 border-t">
+                <div className="mt-4 pt-4 border-t space-y-4">
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Active Buses on this Route</h4>
+                    <div className="space-y-2">
+                      {route.buses.map((bus) => (
+                        <div key={bus.id} className="flex items-center justify-between p-2 bg-muted/50 rounded">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs font-mono">{bus.id}</Badge>
+                            <span className="text-sm">{bus.currentStop}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge 
+                              className={
+                                bus.status === 'on-time' ? 'bg-live text-live-foreground' :
+                                bus.status === 'delayed' ? 'bg-warning text-warning-foreground' :
+                                'bg-accent text-accent-foreground'
+                              }
+                            >
+                              {bus.status}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">{bus.eta}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                   <div className="flex gap-2">
                     <Button size="sm" className="flex-1">
                       Track This Route
