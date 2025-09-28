@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Navigation, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { MapPin, Navigation, Clock, Target } from "lucide-react";
 
 interface BusLocation {
   id: string;
@@ -23,6 +24,13 @@ interface RoutePoint {
 
 const LiveMap = () => {
   const [selectedBus, setSelectedBus] = useState<string | null>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
+
+  const handleTrackBus = (busId: string) => {
+    setSelectedBus(busId);
+    // Scroll to map when tracking a bus
+    mapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   // Route points for Kakinada to Rajahmundry
   const routePoints: RoutePoint[] = [
@@ -130,7 +138,10 @@ const LiveMap = () => {
   return (
     <div className="space-y-4">
       {/* Enhanced Map with Route Visualization */}
-      <div className="h-96 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 rounded-lg relative overflow-hidden border border-slate-300 dark:border-slate-700">
+      <div 
+        ref={mapRef}
+        className="h-96 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 rounded-lg relative overflow-hidden border border-slate-300 dark:border-slate-700"
+      >
         {/* Map Grid Pattern */}
         <div className="absolute inset-0 opacity-20">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -319,6 +330,21 @@ const LiveMap = () => {
                     <span className="text-muted-foreground">{bus.eta}</span>
                   </div>
                   <div className="font-medium text-primary">{bus.speed}</div>
+                </div>
+
+                <div className="flex gap-2 pt-3">
+                  <Button 
+                    size="sm" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleTrackBus(bus.id);
+                    }}
+                    className="flex-1"
+                    variant={isSelected ? "default" : "secondary"}
+                  >
+                    <Target className="w-3 h-3 mr-1" />
+                    {isSelected ? "Tracking" : "Track on Map"}
+                  </Button>
                 </div>
 
                 {isSelected && (
