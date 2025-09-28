@@ -3,12 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, MapPin, Navigation, Bell, Bus, Route } from "lucide-react";
+import { Clock, MapPin, Navigation, Bell, Bus, Route, Ticket } from "lucide-react";
 import LiveMap from "@/components/LiveMap";
 import BusTracker from "@/components/BusTracker";
 import RouteSelector from "@/components/RouteSelector";
 import AlertSystem from "@/components/AlertSystem";
 import BusSchedule from "@/components/BusSchedule";
+import TicketSystem from "@/components/TicketSystem";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -39,10 +40,14 @@ const Index = () => {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-5 w-full max-w-2xl mx-auto mb-6">
+          <TabsList className="grid grid-cols-6 w-full max-w-3xl mx-auto mb-6">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <MapPin className="h-4 w-4" />
               Dashboard
+            </TabsTrigger>
+            <TabsTrigger value="tickets" className="flex items-center gap-2">
+              <Ticket className="h-4 w-4" />
+              Tickets
             </TabsTrigger>
             <TabsTrigger value="routes" className="flex items-center gap-2">
               <Route className="h-4 w-4" />
@@ -100,6 +105,10 @@ const Index = () => {
                 <AlertSystem />
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="tickets">
+            <TicketSystem />
           </TabsContent>
 
           <TabsContent value="routes">

@@ -33,6 +33,18 @@ const LiveMap = () => {
     setSelectedBus(busId);
     // Scroll to map when tracking a bus
     mapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    
+    // Show tracking notification
+    const bus = buses.find(b => b.id === busId);
+    if (bus) {
+      // Browser notification if permission granted
+      if (Notification.permission === 'granted') {
+        new Notification('Bus Tracking Started', {
+          body: `Now tracking ${bus.id} on ${bus.route}. ETA: ${bus.eta}`,
+          icon: '/favicon.ico'
+        });
+      }
+    }
   };
 
   // Route points for Kakinada to Rajahmundry
@@ -139,6 +151,13 @@ const LiveMap = () => {
     },
   ]);
 
+  // Request notification permission
+  useEffect(() => {
+    if (Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
+
   // Simulate real-time updates every 30 seconds with accurate distance tracking
   useEffect(() => {
     const interval = setInterval(() => {
@@ -182,7 +201,7 @@ const LiveMap = () => {
           }
         }
         
-        return {
+        const updatedBus = {
           ...bus,
           lat: newLat,
           lng: newLng,
@@ -191,6 +210,21 @@ const LiveMap = () => {
           status: newStatus,
           distanceTraveled: newDistanceTraveled,
         };
+
+        // Send alerts for tracked bus
+        if (selectedBus === bus.id) {
+          // Alert when ETA changes significantly or status changes
+          if (Math.abs(newEta - parseInt(bus.eta)) > 5 || newStatus !== bus.status) {
+            if (Notification.permission === 'granted') {
+              new Notification(`Bus ${bus.id} Update`, {
+                body: `Status: ${newStatus.toUpperCase()}, ETA: ${newEta} min`,
+                icon: '/favicon.ico'
+              });
+            }
+          }
+        }
+
+        return updatedBus;
       }));
     }, 30000); // Update every 30 seconds
 
@@ -310,6 +344,16 @@ const LiveMap = () => {
             Live GPS Tracking
           </Badge>
         </div>
+
+        {/* Tracking Status */}
+        {selectedBus && (
+          <div className="absolute top-16 left-4">
+            <Badge className="bg-yellow-500 text-white">
+              <div className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></div>
+              Tracking: {buses.find(b => b.id === selectedBus)?.id}
+            </Badge>
+          </div>
+        )}
 
         {/* Coordinate Display */}
         <div className="absolute top-4 right-4">
