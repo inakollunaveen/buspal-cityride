@@ -4,8 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MapPin, Navigation, Clock, Target } from "lucide-react";
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface BusLocation {
   id: string;
@@ -29,39 +27,12 @@ interface RoutePoint {
 
 const LiveMap = () => {
   const [selectedBus, setSelectedBus] = useState<string | null>(null);
-  const [mapboxToken, setMapboxToken] = useState<string>("");
-  const [showTokenInput, setShowTokenInput] = useState<boolean>(true);
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstance = useRef<mapboxgl.Map | null>(null);
-  const markersRef = useRef<{ [key: string]: mapboxgl.Marker }>({});
 
   const handleTrackBus = (busId: string) => {
     setSelectedBus(busId);
     // Scroll to map when tracking a bus
     mapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    
-    // Center map on selected bus
-    const bus = buses.find(b => b.id === busId);
-    if (bus && mapInstance.current) {
-      mapInstance.current.flyTo({
-        center: [bus.lng, bus.lat],
-        zoom: 12,
-        duration: 2000
-      });
-    }
-  };
-
-  // Calculate distance between two points (Haversine formula)
-  const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
-    const R = 6371; // Earth's radius in kilometers
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLng = (lng2 - lng1) * Math.PI / 180;
-    const a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-      Math.sin(dLng/2) * Math.sin(dLng/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c;
   };
 
   // Route points for Kakinada to Rajahmundry
@@ -168,84 +139,7 @@ const LiveMap = () => {
     },
   ]);
 
-  // Initialize Mapbox map
-  useEffect(() => {
-    if (!mapboxToken || !mapRef.current) return;
-
-    mapboxgl.accessToken = mapboxToken;
-    
-    mapInstance.current = new mapboxgl.Map({
-      container: mapRef.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
-      center: [82.2475, 16.9891], // Kakinada coordinates
-      zoom: 10
-    });
-
-    // Add navigation controls
-    mapInstance.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-    return () => {
-      mapInstance.current?.remove();
-    };
-  }, [mapboxToken]);
-
-  // Update bus markers on map
-  useEffect(() => {
-    if (!mapInstance.current) return;
-
-    // Clear existing markers
-    Object.values(markersRef.current).forEach(marker => marker.remove());
-    markersRef.current = {};
-
-    // Add new markers for each bus
-    buses.forEach(bus => {
-      const el = document.createElement('div');
-      el.className = 'bus-marker';
-      el.style.width = '20px';
-      el.style.height = '20px';
-      el.style.borderRadius = '50%';
-      el.style.cursor = 'pointer';
-      el.style.border = '2px solid white';
-      el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
-      
-      if (bus.status === 'on-time') {
-        el.style.backgroundColor = '#10b981';
-      } else if (bus.status === 'delayed') {
-        el.style.backgroundColor = '#ef4444';
-      } else {
-        el.style.backgroundColor = '#3b82f6';
-      }
-
-      if (selectedBus === bus.id) {
-        el.style.transform = 'scale(1.5)';
-        el.style.boxShadow = '0 0 0 4px rgba(255, 193, 7, 0.5)';
-      }
-
-      const marker = new mapboxgl.Marker(el)
-        .setLngLat([bus.lng, bus.lat])
-        .setPopup(
-          new mapboxgl.Popup({ offset: 25 })
-            .setHTML(`
-              <div style="padding: 8px;">
-                <strong>${bus.id}</strong><br/>
-                <span style="color: #666;">${bus.route}</span><br/>
-                <span style="color: #10b981;">Speed: ${bus.speed}</span><br/>
-                <span style="color: #666;">ETA: ${bus.eta}</span><br/>
-                <span style="color: #666;">Distance: ${bus.distanceTraveled.toFixed(1)}/${bus.totalDistance.toFixed(1)} km</span>
-              </div>
-            `)
-        )
-        .addTo(mapInstance.current);
-
-      el.addEventListener('click', () => {
-        setSelectedBus(selectedBus === bus.id ? null : bus.id);
-      });
-
-      markersRef.current[bus.id] = marker;
-    });
-  }, [buses, selectedBus]);
-
-  // Simulate real-time updates every 30 seconds
+  // Simulate real-time updates every 30 seconds with accurate distance tracking
   useEffect(() => {
     const interval = setInterval(() => {
       setBuses(prev => prev.map(bus => {
@@ -303,67 +197,148 @@ const LiveMap = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleTokenSubmit = () => {
-    if (mapboxToken.trim()) {
-      setShowTokenInput(false);
-    }
-  };
-
   return (
     <div className="space-y-4">
-      {/* Mapbox Token Input */}
-      {showTokenInput && (
-        <Card className="p-4">
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-lg font-semibold">Mapbox Integration Required</h3>
-              <p className="text-sm text-muted-foreground">
-                Enter your Mapbox public token to enable real-time mapping. Get your token from{" "}
-                <a href="https://mapbox.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                  mapbox.com
-                </a>
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <Input
-                type="text"
-                placeholder="pk.eyJ1IjoieW91ci11c2VybmFtZSIsImEiOiJjbGV..."
-                value={mapboxToken}
-                onChange={(e) => setMapboxToken(e.target.value)}
-                className="flex-1"
-              />
-              <Button onClick={handleTokenSubmit} disabled={!mapboxToken.trim()}>
-                Connect Map
-              </Button>
-            </div>
-          </div>
-        </Card>
-      )}
-
-      {/* Real Mapbox Map */}
+      {/* Enhanced Map with Route Visualization */}
       <div 
         ref={mapRef}
-        className="h-96 rounded-lg relative overflow-hidden border border-slate-300 dark:border-slate-700"
-        style={{ display: showTokenInput ? 'none' : 'block' }}
+        className="h-96 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 rounded-lg relative overflow-hidden border border-slate-300 dark:border-slate-700"
       >
+        {/* Map Grid Pattern */}
+        <div className="absolute inset-0 opacity-20">
+          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="1"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+          </svg>
+        </div>
+
+        {/* Route Line */}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none">
+          <path
+            d="M 15% 80% Q 30% 60% 45% 40% Q 60% 30% 75% 20% Q 85% 15% 90% 10%"
+            stroke="hsl(var(--primary))"
+            strokeWidth="3"
+            fill="none"
+            strokeDasharray="5,5"
+            className="animate-pulse"
+          />
+        </svg>
+
+        {/* Route Stops */}
+        {routePoints.map((point, index) => (
+          <div
+            key={point.name}
+            className="absolute transform -translate-x-1/2 -translate-y-1/2"
+            style={{
+              left: `${15 + index * 15}%`,
+              top: `${80 - index * 12}%`,
+            }}
+          >
+            <div className="flex flex-col items-center">
+              <div className="w-3 h-3 bg-primary border-2 border-white rounded-full shadow-lg"></div>
+              <div className="mt-1 bg-white dark:bg-slate-800 border rounded px-2 py-1 text-xs font-medium shadow-sm">
+                {point.name}
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {/* Moving Bus Markers */}
+        {buses.map((bus, index) => {
+          // Calculate position based on actual progress ratio
+          const progressRatio = bus.distanceTraveled / bus.totalDistance;
+          const xPos = 15 + progressRatio * 75;
+          const yPos = 80 - progressRatio * 70;
+          const isSelected = selectedBus === bus.id;
+          
+          return (
+            <div
+              key={bus.id}
+              className={`absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-1000 ${
+                isSelected ? 'scale-150 z-20' : 'hover:scale-110'
+              }`}
+              style={{
+                left: `${xPos}%`,
+                top: `${yPos}%`,
+              }}
+              onClick={() => setSelectedBus(isSelected ? null : bus.id)}
+            >
+              <div className="relative group cursor-pointer">
+                {/* Bus Icon */}
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center shadow-lg ${
+                  isSelected ? 'ring-4 ring-yellow-400 ring-opacity-50' : ''
+                } ${
+                  bus.status === 'on-time' ? 'bg-green-500' : 
+                  bus.status === 'delayed' ? 'bg-red-500' : 'bg-blue-500'
+                } animate-pulse`}>
+                  <div className="w-2 h-2 bg-white rounded-sm"></div>
+                </div>
+                
+                {/* Bus Info Tooltip */}
+                <div className={`absolute -top-24 left-1/2 transform -translate-x-1/2 bg-white dark:bg-slate-800 border rounded-lg px-3 py-2 text-xs whitespace-nowrap shadow-lg transition-opacity pointer-events-none z-10 ${
+                  isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                }`}>
+                  <div className="font-medium">{bus.id}</div>
+                  <div className="text-muted-foreground">{bus.route}</div>
+                  <div className="text-green-600">{bus.speed}</div>
+                  <div className="text-blue-600">{bus.distanceTraveled.toFixed(1)}/{bus.totalDistance.toFixed(1)} km</div>
+                  <div className="text-xs text-muted-foreground">Click to track</div>
+                </div>
+                
+                {/* Direction Arrow */}
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full flex items-center justify-center">
+                  <Navigation className="w-2 h-2 text-white" style={{ transform: 'rotate(45deg)' }} />
+                </div>
+
+                {/* Selection Pulse Effect */}
+                {isSelected && (
+                  <div className="absolute inset-0 rounded-full bg-yellow-400 opacity-30 animate-ping"></div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+
         {/* Live Status Badge */}
-        <div className="absolute top-4 left-4 z-10">
+        <div className="absolute top-4 left-4">
           <Badge variant="secondary" className="bg-primary text-primary-foreground">
             <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
             Live GPS Tracking
           </Badge>
         </div>
 
-        {/* Change Map Button */}
-        <div className="absolute top-4 right-4 z-10">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => setShowTokenInput(true)}
-            className="bg-white/90 dark:bg-slate-800/90"
-          >
-            Change Token
-          </Button>
+        {/* Coordinate Display */}
+        <div className="absolute top-4 right-4">
+          <Badge variant="outline" className="bg-white/90 dark:bg-slate-800/90">
+            <MapPin className="w-3 h-3 mr-1" />
+            Kakinada Region
+          </Badge>
+        </div>
+
+        {/* Map Legend */}
+        <div className="absolute bottom-4 left-4 bg-white/90 dark:bg-slate-800/90 rounded-lg p-3 text-xs">
+          <div className="font-medium mb-2">Legend</div>
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            <span>On Time</span>
+          </div>
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+            <span>Delayed</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+            <span>Ahead</span>
+          </div>
+        </div>
+
+        {/* Real-time Update Info */}
+        <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-slate-800/90 rounded px-2 py-1 text-xs">
+          Updates every 30s
         </div>
       </div>
 
