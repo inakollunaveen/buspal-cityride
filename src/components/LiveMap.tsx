@@ -122,15 +122,46 @@ const LiveMap = () => {
     },
   ]);
 
-  // Simulate real-time updates
+  // Simulate real-time updates every 30 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      setBuses(prev => prev.map(bus => ({
-        ...bus,
-        lat: bus.lat + (Math.random() - 0.5) * 0.001,
-        lng: bus.lng + (Math.random() - 0.5) * 0.001,
-      })));
-    }, 3000);
+      setBuses(prev => prev.map(bus => {
+        // Simulate movement and update location
+        const newLat = bus.lat + (Math.random() - 0.5) * 0.002;
+        const newLng = bus.lng + (Math.random() - 0.5) * 0.002;
+        
+        // Update ETA (reduce by 1-2 minutes randomly or increase if delayed)
+        const currentEta = parseInt(bus.eta);
+        const etaChange = Math.random() > 0.7 ? Math.floor(Math.random() * 3) + 1 : -Math.floor(Math.random() * 2) - 1;
+        const newEta = Math.max(1, currentEta + etaChange);
+        
+        // Occasionally update speed (±5 km/h)
+        const currentSpeed = parseInt(bus.speed);
+        const speedChange = Math.random() > 0.8 ? (Math.random() - 0.5) * 10 : 0;
+        const newSpeed = Math.max(20, Math.min(80, currentSpeed + speedChange));
+        
+        // Occasionally update status based on ETA changes
+        let newStatus = bus.status;
+        if (Math.random() > 0.9) {
+          if (newEta > currentEta + 5) {
+            newStatus = "delayed";
+          } else if (newEta < currentEta - 3) {
+            newStatus = "ahead";
+          } else {
+            newStatus = "on-time";
+          }
+        }
+        
+        return {
+          ...bus,
+          lat: newLat,
+          lng: newLng,
+          eta: `${newEta} min`,
+          speed: `${Math.round(newSpeed)} km/h`,
+          status: newStatus,
+        };
+      }));
+    }, 30000); // Update every 30 seconds
 
     return () => clearInterval(interval);
   }, []);
