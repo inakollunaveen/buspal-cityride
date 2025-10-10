@@ -10,6 +10,7 @@ import RouteSelector from "@/components/RouteSelector";
 import AlertSystem from "@/components/AlertSystem";
 import BusSchedule from "@/components/BusSchedule";
 import TicketSystem from "@/components/TicketSystem";
+import ChatBoard from "@/components/ChatBoard";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -40,7 +41,7 @@ const Index = () => {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-6 w-full max-w-3xl mx-auto mb-6">
+          <TabsList className="grid grid-cols-7 w-full max-w-4xl mx-auto mb-6">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <MapPin className="h-4 w-4" />
               Dashboard
@@ -64,6 +65,10 @@ const Index = () => {
             <TabsTrigger value="alerts" className="flex items-center gap-2">
               <Bell className="h-4 w-4" />
               Alerts
+            </TabsTrigger>
+            <TabsTrigger value="chat" className="flex items-center gap-2">
+              <Bell className="h-4 w-4" />
+              Study Help
             </TabsTrigger>
           </TabsList>
 
@@ -127,6 +132,10 @@ const Index = () => {
             <div className="max-w-2xl mx-auto">
               <AlertSystem expanded />
             </div>
+          </TabsContent>
+
+          <TabsContent value="chat">
+            <ChatBoard />
           </TabsContent>
         </Tabs>
       </div>
